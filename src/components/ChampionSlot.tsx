@@ -5,6 +5,8 @@ type ChampionSlotProps = {
   champion?: Champion
   active: boolean
   size?: 'lg' | 'md'
+  // Destaca o adversário na mesma rota do jogador.
+  opponent?: boolean
   onSelect: () => void
   onClear: () => void
 }
@@ -14,6 +16,7 @@ export function ChampionSlot({
   champion,
   active,
   size = 'md',
+  opponent = false,
   onSelect,
   onClear,
 }: ChampionSlotProps) {
@@ -30,7 +33,9 @@ export function ChampionSlot({
           className={`${box} grid place-items-center overflow-hidden rounded-full border-2 bg-ink-950 transition ${
             active
               ? 'border-hextech shadow-[0_0_16px] shadow-hextech/60'
-              : 'border-gold-400 hover:border-gold-200'
+              : opponent
+                ? 'border-red-400 shadow-[0_0_12px] shadow-red-500/40'
+                : 'border-gold-400 hover:border-gold-200'
           }`}
         >
           {champion ? (
@@ -55,6 +60,11 @@ export function ChampionSlot({
       <span className="max-w-24 truncate text-center text-xs text-grey-100">
         {champion?.name ?? label}
       </span>
+      {opponent && (
+        <span className="-mt-1 text-[10px] tracking-wider text-red-300 uppercase">
+          Oponente direto
+        </span>
+      )}
     </div>
   )
 }

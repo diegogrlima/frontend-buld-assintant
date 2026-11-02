@@ -1,5 +1,8 @@
 import { Link, Navigate, useLocation } from 'react-router'
+import { LaneIcon } from '../components/LaneIcon'
 import { Panel } from '../components/Panel'
+import { RunePagePanel } from '../components/RunePagePanel'
+import { LANE_NAMES } from '../constants/lanes'
 import type { BuildRecommendation } from '../types/api'
 import type { MatchupState } from './MatchupPage'
 
@@ -31,17 +34,32 @@ export function RecommendationPage() {
             Build recomendada
           </p>
           <h1 className="font-display text-3xl text-gold-100">{champion.name}</h1>
-          <div className="mt-3 flex flex-wrap items-center gap-2">
+          <p className="flex items-center gap-1.5 text-sm text-grey-100">
+            <LaneIcon lane={champion.lane} className="size-4" />
+            {LANE_NAMES[champion.lane]}
+          </p>
+          <div className="mt-3 flex flex-wrap items-center gap-3">
             <span className="text-xs text-grey-100 uppercase">contra</span>
-            {enemies.map((enemy) => (
-              <img
-                key={enemy.id}
-                src={enemy.icon}
-                alt={enemy.name}
-                title={enemy.name}
-                className="size-9 rounded-full border border-red-400/70"
-              />
-            ))}
+            {enemies.map((enemy) => {
+              const opponent = enemy.lane === champion.lane
+              return (
+                <figure key={enemy.id} className="flex flex-col items-center gap-0.5">
+                  <img
+                    src={enemy.icon}
+                    alt={enemy.name}
+                    className={`size-9 rounded-full border ${
+                      opponent ? 'border-2 border-red-400' : 'border-red-400/50'
+                    }`}
+                  />
+                  <figcaption
+                    title={`${enemy.name} (${LANE_NAMES[enemy.lane]})`}
+                    className={`text-[10px] uppercase ${opponent ? 'text-red-300' : 'text-grey-200'}`}
+                  >
+                    {opponent ? 'Oponente' : LANE_NAMES[enemy.lane]}
+                  </figcaption>
+                </figure>
+              )
+            })}
           </div>
         </div>
         <div className="flex flex-col gap-2 sm:items-end">
@@ -90,6 +108,8 @@ export function RecommendationPage() {
           ))}
         </ol>
       </Panel>
+
+      <RunePagePanel runes={recommendation.runes} />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Panel title="Ordem de compra">

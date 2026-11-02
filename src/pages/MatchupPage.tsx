@@ -2,38 +2,52 @@ import { useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 import { ChampionGrid } from '../components/ChampionGrid'
 import { ChampionSlot } from '../components/ChampionSlot'
+import { LaneIcon } from '../components/LaneIcon'
+import { LanePicker } from '../components/LanePicker'
+import { LANES, LANE_NAMES, type Lane } from '../constants/lanes'
 import { Panel } from '../components/Panel'
 import { Spinner } from '../components/Spinner'
 import { useChampions } from '../hooks/useChampions'
 import { getErrorMessage } from '../services/api'
 import { requestRecommendation } from '../services/builds'
-import type { Champion } from '../types/api'
+import type { Champion, LanedChampion } from '../types/api'
 import type { RecommendationState } from './RecommendationPage'
 
-// A API exige exatamente cinco adversários.
-const ENEMY_COUNT = 5
-// Slot 0 é o campeão do jogador; 1 a 5 são os adversários.
+// Slot 0 é o campeão do jogador; os slots 1 a 5 são os adversários, um por rota
+// (na ordem de LANES), como no lobby do jogo. Assim as rotas inimigas nunca se repetem.
 type Slots = (Champion | undefined)[]
 
 // Estado opcional para reabrir a seleção a partir de uma recomendação.
 export type MatchupState = {
-  champion: Champion
-  enemies: Champion[]
+  champion: LanedChampion
+  enemies: LanedChampion[]
 }
 
-function initialSlots(state: unknown): Slots {
+function stripLane({ id, name, icon }: Champion): Champion {
+  return { id, name, icon }
+}
+
+function initialMatchup(state: unknown): { slots: Slots; lane?: Lane } {
   const matchup = state as MatchupState | null
-  if (matchup?.champion && matchup.enemies?.length === ENEMY_COUNT) {
-    return [matchup.champion, ...matchup.enemies]
+  if (matchup?.champion && matchup.enemies?.length === LANES.length) {
+    const byLane = LANES.map((lane) => matchup.enemies.find((enemy) => enemy.lane === lane))
+    if (byLane.every(Boolean)) {
+      return {
+        slots: [stripLane(matchup.champion), ...byLane.map((enemy) => stripLane(enemy!))],
+        lane: matchup.champion.lane,
+      }
+    }
   }
-  return Array.from({ length: ENEMY_COUNT + 1 }, () => undefined)
+  return { slots: Array.from({ length: LANES.length + 1 }, () => undefined) }
 }
 
 export function MatchupPage() {
   const champions = useChampions()
   const navigate = useNavigate()
   const location = useLocation()
-  const [slots, setSlots] = useState<Slots>(() => initialSlots(location.state))
+  const [initial] = useState(() => initialMatchup(location.state))
+  const [slots, setSlots] = useState<Slots>(initial.slots)
+  const [lane, setLane] = useState<Lane | undefined>(initial.lane)
   const [activeSlot, setActiveSlot] = useState(() => {
     const firstEmpty = slots.findIndex((slot) => !slot)
     return firstEmpty === -1 ? 0 : firstEmpty
@@ -45,7 +59,7 @@ export function MatchupPage() {
     () => new Set(slots.filter((slot) => slot !== undefined).map((slot) => slot.id)),
     [slots],
   )
-  const complete = slots.every(Boolean)
+  const complete = slots.every(Boolean) && lane !== undefined
   const [player, ...enemies] = slots
 
   function pick(champion: Champion) {
@@ -71,7 +85,8 @@ export function MatchupPage() {
     try {
       const recommendation = await requestRecommendation({
         championId: player!.id,
-        enemyChampionIds: enemies.map((enemy) => enemy!.id),
+        lane: lane!,
+        enemies: enemies.map((enemy, i) => ({ championId: enemy!.id, lane: LANES[i]! })),
       })
       navigate('/build', { state: { recommendation } satisfies RecommendationState })
     } catch (error) {
@@ -87,8 +102,8 @@ export function MatchupPage() {
           Análise da partida
         </h1>
         <p className="mt-2 max-w-2xl text-grey-100">
-          Escolha o seu campeão e os cinco campeões da equipe adversária. A recomendação traz uma
-          única build adaptada a esse confronto.
+          Escolha o seu campeão, a sua rota e os cinco campeões da equipe adversária em cada rota.
+          A recomendação traz uma única build e uma página de runas adaptadas a esse confronto.
         </p>
       </div>
 
@@ -106,6 +121,13 @@ export function MatchupPage() {
               onSelect={() => setActiveSlot(0)}
               onClear={() => clear(0)}
             />
+            <LanePicker
+              value={lane}
+              onChange={(value) => {
+                setLane(value)
+                setSubmitError(undefined)
+              }}
+            />
           </div>
 
           <span aria-hidden className="font-display text-2xl text-gold-400">
@@ -117,15 +139,21 @@ export function MatchupPage() {
               Equipe adversária
             </span>
             <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
-              {enemies.map((enemy, i) => (
-                <ChampionSlot
-                  key={i}
-                  label={`Adversário ${i + 1}`}
-                  champion={enemy}
-                  active={activeSlot === i + 1}
-                  onSelect={() => setActiveSlot(i + 1)}
-                  onClear={() => clear(i + 1)}
-                />
+              {LANES.map((enemyLane, i) => (
+                <div key={enemyLane} className="flex flex-col items-center gap-1">
+                  <span className="flex items-center gap-1 text-[10px] tracking-wider text-grey-100 uppercase">
+                    <LaneIcon lane={enemyLane} className="size-3.5" />
+                    {LANE_NAMES[enemyLane]}
+                  </span>
+                  <ChampionSlot
+                    label={LANE_NAMES[enemyLane]}
+                    champion={enemies[i]}
+                    active={activeSlot === i + 1}
+                    opponent={lane === enemyLane}
+                    onSelect={() => setActiveSlot(i + 1)}
+                    onClear={() => clear(i + 1)}
+                  />
+                </div>
               ))}
             </div>
           </div>
@@ -147,14 +175,18 @@ export function MatchupPage() {
           </button>
           {!complete && (
             <p className="text-xs text-grey-100">
-              Selecione o seu campeão e os {ENEMY_COUNT} adversários para continuar.
+              Selecione o seu campeão, a sua rota e os {LANES.length} adversários para continuar.
             </p>
           )}
         </div>
       </Panel>
 
       <Panel
-        title={activeSlot === 0 ? 'Selecione o seu campeão' : `Selecione o adversário ${activeSlot}`}
+        title={
+          activeSlot === 0
+            ? 'Selecione o seu campeão'
+            : `Selecione o adversário: ${LANE_NAMES[LANES[activeSlot - 1]!]}`
+        }
       >
         {champions.status === 'loading' && (
           <div className="flex justify-center py-12">
