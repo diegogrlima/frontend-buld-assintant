@@ -1,0 +1,39 @@
+@import 'tailwindcss';
+
+/* Paleta inspirada no cliente do LoL: azul profundo, dourado e detalhes hextech. */
+@theme {
+  --color-ink-950: #010a13;
+  --color-ink-900: #0a1428;
+  --color-ink-800: #1e2328;
+  --color-gold-100: #f0e6d2;
+  --color-gold-200: #c8aa6e;
+  --color-gold-300: #c89b3c;
+  --color-gold-400: #785a28;
+  --color-gold-500: #463714;
+  --color-grey-100: #a09b8c;
+  --color-grey-200: #5b5a56;
+  --color-grey-300: #3c3c41;
+  --color-hextech: #0ac8b9;
+  --color-hextech-dark: #005a82;
+
+  --font-display: 'Cinzel', Georgia, serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-ink-950 font-sans text-gold-100 antialiased;
+    background-image:
+      radial-gradient(ellipse at top, rgb(0 90 130 / 0.25), transparent 60%),
+      radial-gradient(ellipse at bottom, rgb(70 55 20 / 0.25), transparent 60%);
+    background-attachment: fixed;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-hextech;
+  }
+}
