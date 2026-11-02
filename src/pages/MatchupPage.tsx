@@ -140,13 +140,10 @@ export function MatchupPage() {
             </span>
             <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
               {LANES.map((enemyLane, i) => (
-                <div key={enemyLane} className="flex flex-col items-center gap-1">
-                  <span className="flex items-center gap-1 text-[10px] tracking-wider text-grey-100 uppercase">
-                    <LaneIcon lane={enemyLane} className="size-3.5" />
-                    {LANE_NAMES[enemyLane]}
-                  </span>
+                <div key={enemyLane} className="flex flex-col items-center">
                   <ChampionSlot
                     label={LANE_NAMES[enemyLane]}
+                    labelIcon={<LaneIcon lane={enemyLane} className="size-3.5 shrink-0" />}
                     champion={enemies[i]}
                     active={activeSlot === i + 1}
                     opponent={lane === enemyLane}

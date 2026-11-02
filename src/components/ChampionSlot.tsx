@@ -1,7 +1,10 @@
+import type { ReactNode } from 'react'
 import type { Champion } from '../types/api'
 
 type ChampionSlotProps = {
   label: string
+  // Ícone exibido ao lado do texto embaixo do círculo.
+  labelIcon?: ReactNode
   champion?: Champion
   active: boolean
   size?: 'lg' | 'md'
@@ -13,6 +16,7 @@ type ChampionSlotProps = {
 
 export function ChampionSlot({
   label,
+  labelIcon,
   champion,
   active,
   size = 'md',
@@ -57,8 +61,9 @@ export function ChampionSlot({
           </button>
         )}
       </div>
-      <span className="max-w-24 truncate text-center text-xs text-grey-100">
-        {champion?.name ?? label}
+      <span className="flex max-w-24 items-center justify-center gap-1 text-xs text-grey-100">
+        {labelIcon}
+        <span className="truncate">{champion?.name ?? label}</span>
       </span>
       {opponent && (
         <span className="-mt-1 text-[10px] tracking-wider text-red-300 uppercase">
