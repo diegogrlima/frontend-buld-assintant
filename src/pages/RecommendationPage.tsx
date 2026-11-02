@@ -1,7 +1,9 @@
 import { Link, Navigate, useLocation } from 'react-router'
+import { BuildPathPanel } from '../components/BuildPathPanel'
 import { LaneIcon } from '../components/LaneIcon'
 import { Panel } from '../components/Panel'
 import { RunePagePanel } from '../components/RunePagePanel'
+import { SkillOrderPanel } from '../components/SkillOrderPanel'
 import { LANE_NAMES } from '../constants/lanes'
 import type { BuildRecommendation } from '../types/api'
 import type { MatchupState } from './MatchupPage'
@@ -141,30 +143,19 @@ export function RecommendationPage() {
         </ol>
       </Panel>
 
+      <BuildPathPanel
+        starterItems={recommendation.starterItems}
+        starterReason={recommendation.starterReason}
+        build={build}
+        highElo={recommendation.highElo}
+        totalGold={recommendation.totalGold}
+      />
+
+      <SkillOrderPanel skillOrder={recommendation.skillOrder} />
+
       <RunePagePanel runes={recommendation.runes} />
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <Panel title="Ordem de compra">
-          <ol className="flex flex-wrap items-center gap-2 text-sm">
-            {recommendation.purchaseOrder.map((name, i) => (
-              <li key={`${name}-${i}`} className="flex items-center gap-2">
-                <span className="border border-gold-500 bg-ink-950 px-2 py-1 text-gold-100">
-                  {i + 1}. {name}
-                </span>
-                {i < recommendation.purchaseOrder.length - 1 && (
-                  <span aria-hidden className="text-gold-400">
-                    →
-                  </span>
-                )}
-              </li>
-            ))}
-          </ol>
-          <p className="mt-4 text-sm text-grey-100">
-            Custo total: <span className="text-gold-300">{gold.format(recommendation.totalGold)}</span>{' '}
-            de ouro
-          </p>
-        </Panel>
-
         <Panel title="Ameaças consideradas">
           <ul className="space-y-3">
             {threats.map(({ champion: threat, reason }) => (
@@ -189,7 +180,7 @@ export function RecommendationPage() {
           </p>
         </Panel>
 
-        <Panel title="Equilíbrio da escolha">
+        <Panel title="Equilíbrio da escolha" className="lg:col-span-2">
           <p className="leading-relaxed whitespace-pre-line text-grey-100">
             {recommendation.balance}
           </p>
