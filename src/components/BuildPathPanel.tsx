@@ -1,30 +1,22 @@
 import { Fragment, type ReactNode } from 'react'
-import type { BuildItem, HighEloSample, ItemStack } from '../types/api'
+import type { BuildItem, ItemStack } from '../types/api'
 import { Panel } from './Panel'
 
 type BuildPathPanelProps = {
   starterItems: ItemStack[]
   starterReason: string
   build: BuildItem[]
-  highElo: HighEloSample | null
   totalGold: number
 }
 
 const gold = new Intl.NumberFormat('pt-BR')
 
-// Segundos da partida no formato do relógio do jogo (ex.: 13:05).
-function clock(seconds: number) {
-  const minutes = Math.floor(seconds / 60)
-  return `${minutes}:${String(seconds % 60).padStart(2, '0')}`
-}
-
-function Step({ label, title, children }: { label: string; title: string; children: ReactNode }) {
+function Step({ title, children }: { title: string; children: ReactNode }) {
   return (
     <li className="flex flex-col items-center gap-1.5" title={title}>
       <div className="flex items-center gap-1 border border-gold-500 bg-ink-950/80 p-1.5">
         {children}
       </div>
-      <span className="font-display text-xs text-grey-100 tabular-nums">{label}</span>
     </li>
   )
 }
@@ -55,26 +47,21 @@ function stackText(items: ItemStack[]) {
 }
 
 function Connector() {
-  return (
-    <li aria-hidden className="mb-6 h-px w-4 bg-linear-to-r from-gold-400 to-gold-300 sm:w-6" />
-  )
+  return <li aria-hidden className="h-px w-4 bg-linear-to-r from-gold-400 to-gold-300 sm:w-6" />
 }
 
 export function BuildPathPanel({
   starterItems,
   starterReason,
   build,
-  highElo,
   totalGold,
 }: BuildPathPanelProps) {
-  const hasTimeline = (highElo?.timelineMatches ?? 0) > 0
-
   return (
     <Panel title="Caminho da build">
       <ol className="flex flex-wrap items-center gap-x-2 gap-y-4">
         {starterItems.length > 0 && (
           <>
-            <Step label="Início" title={`Compra inicial: ${stackText(starterItems)}`}>
+            <Step title={`Compra inicial: ${stackText(starterItems)}`}>
               {starterItems.map((item) => (
                 <ItemIcon key={item.id} item={item} />
               ))}
@@ -85,7 +72,6 @@ export function BuildPathPanel({
         {build.map((item, index) => (
           <Fragment key={item.id}>
             <Step
-              label={item.highEloSecond !== null ? clock(item.highEloSecond) : '—'}
               title={
                 item.components.length > 0
                   ? `Compre ${stackText(item.components)} e feche ${item.name} (${gold.format(item.gold)} de ouro)`
@@ -124,9 +110,7 @@ export function BuildPathPanel({
         </p>
       )}
       <p className="mt-3 text-xs text-grey-100">
-        {hasTimeline
-          ? `Cada etapa mostra os componentes da receita a comprar antes de fechar o item. Tempos medianos em que jogadores de Challenger e Grão-Mestre fecharam o 1º, 2º, 3º... item, em ${gold.format(highElo!.timelineMatches)} partidas com a linha do tempo de compras.`
-          : 'Cada etapa mostra os componentes da receita a comprar antes de fechar o item. Sem a linha do tempo de compras do alto elo para este campeão nesta rota, os tempos não estão disponíveis.'}
+        Cada etapa mostra os componentes da receita a comprar antes de fechar o item.
       </p>
       <p className="mt-2 text-sm text-grey-100">
         Custo total: <span className="text-gold-300">{gold.format(totalGold)}</span> de ouro

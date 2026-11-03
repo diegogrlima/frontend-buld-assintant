@@ -1,6 +1,6 @@
 # LoL Build Assistant — Frontend
 
-Interface web do **LoL Build Assistant**: escolha seu campeão, a rota e os inimigos do confronto e receba uma build recomendada por IA, com dados de alto elo.
+Interface web do **LoL Build Assistant**: escolha seu campeão, a rota e os inimigos do confronto e receba uma build recomendada por IA.
 
 O backend fica em um projeto separado (`api-lol-build-assistant`) e precisa estar rodando para o app funcionar.
 
@@ -9,7 +9,7 @@ O backend fica em um projeto separado (`api-lol-build-assistant`) e precisa esta
 - Seleção do campeão, da rota (com os ícones oficiais) e dos inimigos do confronto.
 - Página de runas recomendada, no estilo do cliente do jogo.
 - Caminho da build (itens) e ordem de habilidades.
-- Ameaças do confronto e dados de alto elo exibidos junto à recomendação.
+- Ameaças do confronto exibidas junto à recomendação.
 
 ## Stack
 

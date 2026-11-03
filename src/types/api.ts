@@ -37,12 +37,6 @@ export type BuildItem = {
   icon: string
   gold: number
   reason: string
-  // Fração (0 a 1) das partidas de alto elo com o campeão na rota que terminaram com o item;
-  // null quando não há dados de alto elo.
-  highEloPickRate: number | null
-  // Segundo mediano em que o alto elo completa o item desta posição da build (1º, 2º...);
-  // null quando não há linha do tempo das partidas.
-  highEloSecond: number | null
   // Componentes da receita a comprar antes de fechar o item, do mais barato ao mais caro.
   components: (ItemStack & { gold: number })[]
 }
@@ -61,33 +55,16 @@ export type RunePage = {
   reason: string
 }
 
-export type HighEloSample = {
-  tiers: string[]
-  patches: string[]
-  matches: number
-  // Fração (0 a 1) de vitórias nessas partidas.
-  winRate: number
-  // Quantas dessas partidas têm a linha do tempo usada no caminho da build.
-  timelineMatches: number
-}
-
 export type SkillKey = 'Q' | 'W' | 'E' | 'R'
 
 export type SkillOrder = {
-  // "lane": partidas de alto elo do campeão na rota; "champion": em qualquer rota;
-  // "ai": sem partidas, só a prioridade escolhida pela IA.
-  source: 'lane' | 'champion' | 'ai'
-  // Habilidade de cada nível, do 1 ao 18. Só termina antes em campeões com regras próprias de
-  // pontos (ex.: Udyr), em que apenas os níveis das partidas são mostrados.
+  // Habilidade de cada nível, do 1 ao 18. Fica vazia em campeões com regras próprias de
+  // pontos (ex.: Udyr), em que só a prioridade é mostrada.
   levels: SkillKey[]
-  // Quantos níveis iniciais vêm das partidas; os seguintes são sugeridos pela prioridade.
-  observedLevels: number
   // Ordem para maximizar as habilidades básicas (ex.: Q > E > W).
   priority: SkillKey[]
   spells: { key: SkillKey; name: string; icon: string }[]
-  matches: number
-  // Justificativa da IA; null quando a ordem vem das partidas.
-  reason: string | null
+  reason: string
 }
 
 export type BuildRecommendation = {
@@ -105,8 +82,6 @@ export type BuildRecommendation = {
   justification: string
   balance: string
   warnings: string[]
-  // Partidas de Challenger e Grão-Mestre usadas como base; null quando não há dados.
-  highElo: HighEloSample | null
   dataVersion: string
 }
 

@@ -4,8 +4,6 @@ import { Panel } from './Panel'
 const KEYS: SkillKey[] = ['Q', 'W', 'E', 'R']
 const LEVELS = Array.from({ length: 18 }, (_, index) => index + 1)
 
-const count = new Intl.NumberFormat('pt-BR')
-
 function SkillIcon({ order, skill }: { order: SkillOrder; skill: SkillKey }) {
   const spell = order.spells.find((s) => s.key === skill)
   return (
@@ -23,8 +21,7 @@ function SkillIcon({ order, skill }: { order: SkillOrder; skill: SkillKey }) {
 }
 
 export function SkillOrderPanel({ skillOrder }: { skillOrder: SkillOrder }) {
-  const { levels, observedLevels } = skillOrder
-  const suggested = levels.length - observedLevels
+  const { levels } = skillOrder
 
   return (
     <Panel title="Ordem das habilidades">
@@ -42,7 +39,7 @@ export function SkillOrderPanel({ skillOrder }: { skillOrder: SkillOrder }) {
         ))}
       </div>
 
-      {skillOrder.reason && <p className="mt-3 text-sm text-grey-100">{skillOrder.reason}</p>}
+      <p className="mt-3 text-sm text-grey-100">{skillOrder.reason}</p>
 
       {/* Uma linha por habilidade e uma coluna por nível, como no cliente do jogo. */}
       {levels.length > 0 && (
@@ -73,25 +70,15 @@ export function SkillOrderPanel({ skillOrder }: { skillOrder: SkillOrder }) {
                   </th>
                   {LEVELS.map((level) => {
                     const chosen = levels[level - 1]
-                    // Níveis sugeridos pela prioridade ficam tracejados e mais apagados.
-                    const fromMatch = level <= observedLevels
                     return (
                       <td
                         key={level}
-                        title={
-                          chosen === skill
-                            ? `Nível ${level}: ${skill} (${fromMatch ? 'partidas de alto elo' : 'sugerido'})`
-                            : undefined
-                        }
+                        title={chosen === skill ? `Nível ${level}: ${skill} ` : undefined}
                         className={`h-10 w-7 border font-display text-xs ${
                           chosen === skill
                             ? skill === 'R'
-                              ? fromMatch
-                                ? 'border-hextech bg-hextech-dark/60 text-gold-100'
-                                : 'border-dashed border-hextech/70 bg-hextech-dark/25 text-gold-100/80'
-                              : fromMatch
-                                ? 'border-gold-300 bg-gold-400/60 text-gold-100'
-                                : 'border-dashed border-gold-300/70 bg-gold-400/20 text-gold-100/80'
+                              ? 'border-hextech bg-hextech-dark/60 text-gold-100'
+                              : 'border-gold-300 bg-gold-400/60 text-gold-100'
                             : chosen
                               ? 'border-gold-500/40 bg-ink-950/60'
                               : 'border-gold-500/20 bg-ink-950/30'
@@ -108,36 +95,11 @@ export function SkillOrderPanel({ skillOrder }: { skillOrder: SkillOrder }) {
         </div>
       )}
 
-      {suggested > 0 && observedLevels > 0 && (
-        <p className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-grey-100">
-          <span className="flex items-center gap-1.5">
-            <span aria-hidden className="size-3 border border-gold-300 bg-gold-400/60" />
-            Partidas de alto elo
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span
-              aria-hidden
-              className="size-3 border border-dashed border-gold-300/70 bg-gold-400/20"
-            />
-            Sugerido pela prioridade
-          </span>
-        </p>
-      )}
-
       <p className="mt-3 text-xs text-grey-100">
-        {skillOrder.source === 'ai'
-          ? 'Ainda não há partidas de Challenger e Grão-Mestre com a ordem de habilidades deste campeão: a prioridade foi sugerida pela IA a partir das habilidades dele, e a sequência segue as regras do jogo (ultimate nos níveis 6, 11 e 16).'
-          : `Sequência mais comum entre jogadores de Challenger e Grão-Mestre, em ${count.format(skillOrder.matches)} partidas${
-              skillOrder.source === 'champion'
-                ? ' com este campeão em qualquer rota (não há partidas suficientes nesta rota)'
-                : ''
-            }.${
-              suggested > 0
-                ? ` Depois do nível ${observedLevels}, poucas partidas seguiram a mesma sequência; os níveis seguintes são sugeridos pela prioridade, seguindo as regras do jogo.`
-                : ''
-            }`}
+        A prioridade foi sugerida pela IA a partir das habilidades do campeão, e a sequência segue
+        as regras do jogo (ultimate nos níveis 6, 11 e 16).
         {levels.length < LEVELS.length &&
-          ' Este campeão tem regras próprias de pontos de habilidade, então só os níveis vistos nas partidas são mostrados.'}
+          ' Este campeão tem regras próprias de pontos de habilidade, então só a prioridade é mostrada.'}
       </p>
     </Panel>
   )

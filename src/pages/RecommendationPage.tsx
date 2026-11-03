@@ -15,8 +15,6 @@ export type RecommendationState = {
 
 const gold = new Intl.NumberFormat('pt-BR')
 
-const percent = (fraction: number) => `${Math.round(fraction * 100)}%`
-
 export function RecommendationPage() {
   const location = useLocation()
   const recommendation = (location.state as RecommendationState | null)?.recommendation
@@ -80,27 +78,6 @@ export function RecommendationPage() {
         </div>
       </div>
 
-      {recommendation.highElo ? (
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-1 border border-hextech/40 bg-hextech-dark/20 px-4 py-3 text-sm">
-          <span className="font-display text-xs tracking-[0.2em] text-hextech uppercase">
-            Alto elo
-          </span>
-          <span className="text-gold-100">
-            Baseada em {gold.format(recommendation.highElo.matches)} partidas de Challenger e
-            Grão-Mestre com {champion.name} no {LANE_NAMES[champion.lane].toLowerCase()}
-          </span>
-          <span className="text-grey-100">
-            {percent(recommendation.highElo.winRate)} de vitórias · patch{' '}
-            {recommendation.highElo.patches.join(', ')}
-          </span>
-        </div>
-      ) : (
-        <p className="border border-gold-500/60 px-4 py-3 text-sm text-grey-100">
-          Sem partidas de Challenger e Grão-Mestre para este campeão nesta rota: a recomendação não
-          usou dados de alto elo.
-        </p>
-      )}
-
       {recommendation.warnings.length > 0 && (
         <div role="note" className="border border-amber-500/60 bg-amber-950/30 p-4">
           <p className="mb-2 font-display text-xs tracking-[0.2em] text-amber-300 uppercase">
@@ -127,15 +104,6 @@ export function RecommendationPage() {
               <div className="min-w-0">
                 <p className="font-semibold text-gold-100">{item.name}</p>
                 <p className="text-xs text-gold-300">{gold.format(item.gold)} de ouro</p>
-                {item.highEloPickRate !== null && (
-                  <p
-                    className={`text-xs ${item.highEloPickRate > 0 ? 'text-hextech' : 'text-grey-200'}`}
-                  >
-                    {item.highEloPickRate > 0
-                      ? `${percent(item.highEloPickRate)} dos jogadores de alto elo`
-                      : 'Fora das escolhas mais comuns do alto elo'}
-                  </p>
-                )}
                 <p className="mt-1 text-sm text-grey-100">{item.reason}</p>
               </div>
             </li>
@@ -147,7 +115,6 @@ export function RecommendationPage() {
         starterItems={recommendation.starterItems}
         starterReason={recommendation.starterReason}
         build={build}
-        highElo={recommendation.highElo}
         totalGold={recommendation.totalGold}
       />
 
