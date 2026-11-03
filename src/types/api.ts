@@ -73,7 +73,6 @@ export type BuildRecommendation = {
   build: BuildItem[]
   // Compra inicial recomendada (Doran, poções, companheiro da selva...), com a quantidade.
   starterItems: ItemStack[]
-  starterReason: string
   purchaseOrder: string[]
   skillOrder: SkillOrder
   runes: RunePage

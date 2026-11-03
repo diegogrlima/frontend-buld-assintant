@@ -4,7 +4,6 @@ import { Panel } from './Panel'
 
 type BuildPathPanelProps = {
   starterItems: ItemStack[]
-  starterReason: string
   build: BuildItem[]
   totalGold: number
 }
@@ -50,12 +49,7 @@ function Connector() {
   return <li aria-hidden className="h-px w-4 bg-linear-to-r from-gold-400 to-gold-300 sm:w-6" />
 }
 
-export function BuildPathPanel({
-  starterItems,
-  starterReason,
-  build,
-  totalGold,
-}: BuildPathPanelProps) {
+export function BuildPathPanel({ starterItems, build, totalGold }: BuildPathPanelProps) {
   return (
     <Panel title="Caminho da build">
       <ol className="flex flex-wrap items-center gap-x-2 gap-y-4">
@@ -103,15 +97,6 @@ export function BuildPathPanel({
         ))}
       </ol>
 
-      {starterReason && (
-        <p className="mt-4 text-sm text-grey-100">
-          <span className="font-semibold text-gold-100">Compra inicial: </span>
-          {starterReason}
-        </p>
-      )}
-      <p className="mt-3 text-xs text-grey-100">
-        Cada etapa mostra os componentes da receita a comprar antes de fechar o item.
-      </p>
       <p className="mt-2 text-sm text-grey-100">
         Custo total: <span className="text-gold-300">{gold.format(totalGold)}</span> de ouro
       </p>

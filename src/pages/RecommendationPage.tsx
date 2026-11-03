@@ -113,7 +113,6 @@ export function RecommendationPage() {
 
       <BuildPathPanel
         starterItems={recommendation.starterItems}
-        starterReason={recommendation.starterReason}
         build={build}
         totalGold={recommendation.totalGold}
       />
